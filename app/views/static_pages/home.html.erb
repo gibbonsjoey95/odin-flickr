@@ -1,16 +1,21 @@
 <h1>Flickr Photo Viewer</h1>
 
-<%= form_tag(root_path, method: :get) do %>
-  <%= label_tag(:user_id, 'Flickr User ID:') %>
-  <%= text_field_tag(:user_id) %>
-  <%= submit_tag('Show Photos') %>
+<%= form_tag({ controller: 'static_pages', action: 'home' }, method: 'get') do %>
+  <%= text_field_tag 'user_id', nil, placeholder: 'Enter Flickr User ID' %>
+  <%= submit_tag 'Show Photos' %>
 <% end %>
 
-<% if @photos.present? %>
-  <h2>Photos from Flickr User</h2>
+
+<% if @photos_info.present? %>
   <ul>
-    <% @photos.each do |photo| %>
-      <li><%= image_tag(photo.small_square_url, alt: 'Flickr Photo') %></li>
+    <% @photos_info.each do |photo_info| %>
+      <li>
+        <strong>Title:</strong> <%= photo_info[:title] %><br>
+        <strong>Taken at:</strong> <%= photo_info[:taken_at] %><br>
+        <strong>URL:</strong> <%= image_tag(photo_info[:url]) %><br>
+      </li>
     <% end %>
   </ul>
+<% else %>
+  <p>No recent photos found.</p>
 <% end %>

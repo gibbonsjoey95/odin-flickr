@@ -6,16 +6,14 @@
 <% end %>
 
 
-<% if @photos_info.present? %>
-  <ul>
-    <% @photos_info.each do |photo_info| %>
-      <li>
-        <strong>Title:</strong> <%= photo_info[:title] %><br>
-        <strong>Taken at:</strong> <%= photo_info[:taken_at] %><br>
-        <strong>URL:</strong> <%= image_tag(photo_info[:url]) %><br>
-      </li>
+<% if @photo_title.present? %>
+  <% @photo_title.each do |photo|%>
+    <h2><%= photo[:title] %></h2>
+    <% if photo[:taken_at].present? %>
+      <p>Taken at: <%= photo[:taken_at] %></p>
     <% end %>
-  </ul>
-<% else %>
-  <p>No recent photos found.</p>
+    <% if photo[:url].present? %>
+      <%= image_tag photo[:title], alt: photo[:title] %>
+    <% end %>
+  <% end %>
 <% end %>

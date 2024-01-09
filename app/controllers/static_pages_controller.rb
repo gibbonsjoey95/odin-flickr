@@ -54,29 +54,29 @@ class StaticPagesController < ApplicationController
   #   end
   # end
 
-  def home
-    if params[:user_id].present?
-      begin
-        flickr = Flickr.new
+  # def home
+  #   if params[:user_id].present?
+  #     begin
+  #       flickr = Flickr.new
 
-        # Fetch recent photos for the given user ID
-        recent_photos = flickr.people.getPhotos(user_id: params[:user_id]).to_a
+  #       # Fetch recent photos for the given user ID
+  #       recent_photos = flickr.people.getPhotos(user_id: params[:user_id]).to_a
 
-        # Display information for the first photo (you can modify this as needed)
-        if recent_photos.present?
-          first_photo = recent_photos.first
-          info = flickr.photos.getInfo(photo_id: first_photo.id, secret: first_photo.secret)
+  #       # Display information for the first photo (you can modify this as needed)
+  #       if recent_photos.present?
+  #         first_photo = recent_photos.first
+  #         info = flickr.photos.getInfo(photo_id: first_photo.id, secret: first_photo.secret)
 
-          @photo_title = info.title
-          @photo_taken_at = info.dates.taken
-        else
-          @photo_title = "No recent photos found"
-        end
-      rescue Flickr::FailedResponse => e
-        flash[:alert] = "Error retrieving photos: #{e.message}"
-      end
-    end
-  end
+  #         @photo_title = info.title
+  #         @photo_taken_at = info.dates.taken
+  #       else
+  #         @photo_title = "No recent photos found"
+  #       end
+  #     rescue Flickr::FailedResponse => e
+  #       flash[:alert] = "Error retrieving photos: #{e.message}"
+  #     end
+  #   end
+  # end
 
   # def home
   #   if params[:user_id].present?
@@ -109,4 +109,59 @@ class StaticPagesController < ApplicationController
   # end
   
 
+  # def home
+  #   if params[:user_id].present?
+  #     begin
+  #       flickr = Flickr.new
+  #       user_info = flickr.people.fi("https://www.flickr.com/photos/#{params[:user_id]}/")
+  #       @photos = flickr.photos.getContactsPublicPhotos(user_id: user_info.id, count: 10).to_a
+  #     rescue Flickr::FailedResponse => e
+  #       flash[:alert] = "Error retrieving photos: #{e.message}"
+  #     end
+  #   end
+  # end
+
+
+  # def home
+  #   @photos = []
+
+  #   if params[:user_id].present?
+  #     begin
+  #       flickr = Flickr.new
+  #     @photos = flickr.people.getPhotos(user_id: params[:user_id], per_page: 10).to_a
+
+  #     @info = flickr.photos.getInfo(photo_id: params[:id] )
+
+  #     puts 'INFO'
+
+  #     rescue Flickr::FailedResponse => e
+  #       flash[:alert] = "Error retrieving photos: #{e.message}"
+  #     end
+  #   end
+  # end
+
+  def home
+    @photos = []
+  
+    if params[:user_id].present?
+      begin
+        flickr = Flickr.new
+        photo_list = flickr.people.getPhotos(user_id: params[:user_id], per_page: 10).to_a
+  
+        photo_list.each do |photo|
+          info = flickr.photos.getInfo(photo_id: photo.id)
+          sizes = flickr.photos.getSizes(photo_id: photo.id)
+          direct_url = sizes.find { |s| s.label ==  'Medium 640' }.source
+          # sizes.find { |s| s.label == 'Medium 640' }&.source
+
+          title = info.title
+          # urls = info.urls.url[0]._content
+          id = info.id
+          @photos << { title: title, urls: direct_url , id: id}
+        end
+      rescue Flickr::FailedResponse => e
+        flash[:alert] = "Error retrieving photos: #{e.message}"
+      end
+    end
+  end
 end
